@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+{% block nav %}
+    {{ parent() }}
+{% endblock %}
+{% block body %}
+    <div id="wrapper">
+        <div id="container">
+            <div class="row">
+                <div class="col-md-6 new_dis_form col-md-offset-1">
+                    <h1>Dodaj nową chorobe</h1>
+                    <div>
+                        <form id="new_dis_form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="name" placeholder="Nazwa choroby">
+                            </div>
+                            <div class="form-group">
+                                <input type="password" class="form-control" id="other" placeholder="Nazwa lacinska i inne nazwy">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="pato" placeholder="Zwiezly charakterystyka patogenezy">
+                            </div>
+                            <div class="form-group">
+                                <label for="pato_desc">Opis patogenezy</label>
+                                <textarea class="form-control" rows="3" id="pato_desc"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="epi">Epidemiologia</label>
+                                <textarea class="form-control" rows="3" id="epi"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="diagno">Diagnostyka</label>
+                                <textarea class="form-control" rows="3" id="diagno"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="diff">Roznicowanie</label>
+                                <textarea class="form-control" rows="2" id="diff"></textarea>
+                            </div>
+                           <!-- <div class="form-group">
+                                <label for="exampleInputFile">File input</label>
+                                <input type="file" id="exampleInputFile">
+                                <p class="help-block">Example block-level help text here.</p>
+                            </div>-->
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox">Zgadzam sie na wszystko
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-default">Submit</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-default btn-block" onclick="$('#czynnik').addClass('uncollapsed');">Dodaj czynnik/przyczyne</button>
+                    <div class="" id="czynnik"></div>
+                    <button class="btn btn-default btn-block">Dodaj objawy</button>
+                    <div class="" id="objawy"></div>
+                    <button class="btn btn-default btn-block">Dodaj zmiany anatomo-patologiczne</button>
+                    <div class="" id="anapat"></div>
+                    <button class="btn btn-default btn-block">Dodaj badania dodatkowe</button>
+                    <div class="" id="dodatkowe"></div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+{% endblock %}
