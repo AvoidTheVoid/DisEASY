@@ -11,6 +11,7 @@ namespace AppBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use AppBundle\Entity\Disease;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -22,21 +23,46 @@ class DiseaseController extends Controller
     /**
      * @Route("/disease")
      */
-    public function showList(){
+    public function showList()
+    {
         return $this->render('disease/list.html.twig');
     }
+
     /**
      * @Route("/disease/add")
      */
-    public function addEntry(Request $request){
+    public function addEntry(Request $request)
+    {
 
-        $task = new Disease();
-        $task->setId(1);
+        $disease = new Disease();
 
-      /*  $form = $this->createFormBuilder($task)
-            ->add('task', TextType::class)
-            ->add('save', SubmitType::class, array('label' => 'Create Post'))
-            ->getForm();*/
-        return $this->render('disease/add.html.twig');
+        //$disease->setName("rzezaczka");
+        //$disease->setOthernames("rzezaczitis");
+
+
+        $form = $this->createFormBuilder($disease)
+            ->add('name')
+            ->add('othernames')
+            ->add('patogenesis')
+            ->add('p_desc')
+            ->add('epi')
+            ->add('diagno')
+            ->add('diff')
+            ->add('save', SubmitType::class)
+            ->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $task = $form->getData();
+
+            $zap = $this->getDoctrine()->getManager();
+            $zap->persist($task);
+            $zap->flush();
+
+            //return $this->redirectToRoute('/');
+        }
+        return $this->render('disease/add.html.twig',array(
+            'form' => $form->createView(),
+        ));
+
     }
 }
