@@ -8,6 +8,7 @@ namespace AppBundle\Entity;
  */
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity
@@ -15,6 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Disease
 {
+    protected $tags;
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -56,6 +58,11 @@ class Disease
      * @ORM\Column(type="text")
      */
     private $diff;
+
+    public function __construct()
+    {
+        $this->tags = new ArrayCollection();
+    }
 
     /**
      * @return mixed
@@ -182,5 +189,21 @@ class Disease
     public function setPDesc($p_desc)
     {
         $this->p_desc = $p_desc;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param mixed $tags
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
     }
 }

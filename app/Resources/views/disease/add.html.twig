@@ -50,37 +50,41 @@
                     <div class="panel-heading">
                         <h1>Dodaj nową chorobe</h1>
                     </div>
-                    <form id="new_dis_form" method="post">
+                    <form id="new_dis_form" method="post" onsubmit="addTags();">
                         <div class="form-group">
-                            <input type="text" class="form-control" name="form[name]" required="required"
+                            <input type="text" class="form-control" name="disease[name]" required="required"
                                    placeholder="Nazwa choroby">
                         </div>
                         <div class="form-group">
-                            <input type="text" class="form-control" name="form[othernames]"
+                            <input type="text" class="form-control" name="disease[othernames]"
                                    placeholder="Nazwa lacinska i nazwy zwyczajowe">
                         </div>
                         <div class="form-group">
-                            <input type="text" class="form-control" name="form[patogenesis]"
+                            <input type="text" class="form-control" name="disease[patogenesis]"
                                    placeholder="Zwiezla charakterystyka patogenezy">
                         </div>
                         <div class="form-group">
                             <label for="pato_desc">Opis patogenezy</label>
-                            <textarea class="form-control" rows="3" name="form[p_desc]"></textarea>
+                            <textarea class="form-control" rows="3" name="disease[p_desc]"></textarea>
                         </div>
                         <div class="form-group">
                             <label for="epi">Epidemiologia</label>
-                            <textarea class="form-control" rows="3" name="form[epi]"></textarea>
+                            <textarea class="form-control" rows="3" name="disease[epi]"></textarea>
                         </div>
                         <div class="form-group">
                             <label for="diagno">Diagnostyka</label>
-                            <textarea class="form-control" rows="3" name="form[diagno]"></textarea>
+                            <textarea class="form-control" rows="3" name="disease[diagno]"></textarea>
                         </div>
                         <div class="form-group">
                             <label for="diff">Roznicowanie</label>
-                            <textarea class="form-control" rows="2" name="form[diff]"></textarea>
+                            <textarea class="form-control" rows="2" name="disease[diff]"></textarea>
                         </div>
                         {{ form_widget(form._token) }}
-                        <button type="submit" name="form[save]" class="btn btn-default">Zapisz</button>
+                        <input type="hidden" name="disease[tags][0][name]" id="przyczyny" value="">
+                        <input type="hidden" name="disease[tags][1][name]" id="objawy" value="">
+                        <input type="hidden" name="disease[tags][2][name]" id="pato" value="">
+                        <input type="hidden" name="disease[tags][3][name]" id="dod" value="">
+                        <button type="submit" name="disease[save]" class="btn btn-default">Zapisz</button>
                     </form>
                     </div>
                 </div>
@@ -146,32 +150,57 @@
     {{ parent() }}
     <script src="{{ asset('js/jquery.autocomplete.js') }}"></script>
     <script>
-        var czynnikCount=0;
+        var czynnikCount=0,
+                id_czynnika;
+
         var przyczyny = [
                 {% for key,value in przyczyny %}{
-                value: '{{ value[0] }}', data: '{{ value[1] }}'
+                id: {{ value[0] }},value: '{{ value[1] }}', data: '{{ value[2] }}'
             },
             {% endfor %}
         ];
         $('#nazwaCzynnika').autocomplete({
             lookup: przyczyny,
             onSelect: function (suggestion) {
-                $("#typ_czynnika").val(suggestion.data)
+                $("#typ_czynnika").val(suggestion.data);
                 var thehtml = '<strong>Nazwa:</strong> ' + suggestion.value + ' <br> <strong>Rodzaj:</strong> ' + $("#typ_czynnika").find(":selected").text();
                 ;
+                id_czynnika=suggestion.id;
                 $('#outputcontent').html(thehtml);
             }
         });
+        var czynniki= new Object;
+        function removeCause(item){
+            cause_id=item.id.split("_")[1];
+                delete czynniki[cause_id];
+                item.parentElement.removeChild(item);
+                czynnikCount--;
+        }
         function addNewCause() {
             czynnikCount++;
             var button = document.createElement("button");
             button.id="czynnik_" +(czynnikCount).toString();
             button.className="btn btn-info";
             button.style="margin:0.2em;"
+            button.onclick=function(){
+                removeCause(button);
+            };
+            czynniki[czynnikCount]=id_czynnika;
             button.innerHTML = $("#nazwaCzynnika").val()+' <i class="fa fa-times" aria-hidden="true"></i>';
             $("#panel_przyczyny").append(button);
             $("#nazwaCzynnika").val("")
+        }
 
+        function addTags() {
+            var all='';
+            jQuery.each(czynniki,
+                    function(index, value){
+                        all+=value+"|";
+                    }
+            );
+            all = all.substring(0, all.length - 1);
+            $("#przyczyny").val(all);
+            console.log($("#przyczyny").val());
         }
     </script>
 
