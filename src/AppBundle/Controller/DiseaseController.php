@@ -21,7 +21,7 @@ class DiseaseController extends Controller
 {
 
     /**
-     * @Route("/disease")
+     * @Route("/disease/")
      */
     public function showList()
     {
@@ -36,10 +36,6 @@ class DiseaseController extends Controller
 
         $disease = new Disease();
 
-        //$disease->setName("rzezaczka");
-        //$disease->setOthernames("rzezaczitis");
-
-
         $form = $this->createFormBuilder($disease)
             ->add('name')
             ->add('othernames')
@@ -50,7 +46,14 @@ class DiseaseController extends Controller
             ->add('diff')
             ->add('save', SubmitType::class)
             ->getForm();
+        $przyczyny= $this->getDoctrine()->getRepository('AppBundle:Przyczyny')->findAll();
+       // print_r($przyczyny);
+        foreach($przyczyny as $a)
+        {
+            $prz_form[]=$a->getName();
+        }
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             $task = $form->getData();
 
@@ -58,10 +61,11 @@ class DiseaseController extends Controller
             $zap->persist($task);
             $zap->flush();
 
-            //return $this->redirectToRoute('/');
+            //return $this->redirectToRoute('/disease/list');
         }
         return $this->render('disease/add.html.twig',array(
             'form' => $form->createView(),
+            'przyczyny' => $prz_form,
         ));
 
     }
