@@ -48,9 +48,16 @@ class DiseaseController extends Controller
             ->getForm();
         $przyczyny= $this->getDoctrine()->getRepository('AppBundle:Przyczyny')->findAll();
        // print_r($przyczyny);
+
         foreach($przyczyny as $a)
         {
-            $prz_form[]=$a->getName();
+            if(!is_null($a->getLatin()))$latin=" / ".($a->getLatin());
+            else $latin='';
+            $prz_form[]=[
+                ($a->getName()).$latin,
+                $a->getType(),
+            ];
+
         }
         $form->handleRequest($request);
 
