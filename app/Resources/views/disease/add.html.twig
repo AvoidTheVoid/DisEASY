@@ -151,7 +151,8 @@
     <script src="{{ asset('js/jquery.autocomplete.js') }}"></script>
     <script>
         var czynnikCount=0,
-                id_czynnika;
+                id_czynnika,
+                last=0;
 
         var przyczyny = [
                 {% for key,value in przyczyny %}{
@@ -163,9 +164,11 @@
             lookup: przyczyny,
             onSelect: function (suggestion) {
                 $("#typ_czynnika").val(suggestion.data);
+                $("#typ_czynnika").prop('disabled', 'disabled');
                 var thehtml = '<strong>Nazwa:</strong> ' + suggestion.value + ' <br> <strong>Rodzaj:</strong> ' + $("#typ_czynnika").find(":selected").text();
                 ;
                 id_czynnika=suggestion.id;
+                last=1;
                 $('#outputcontent').html(thehtml);
             }
         });
@@ -185,10 +188,15 @@
             button.onclick=function(){
                 removeCause(button);
             };
-            czynniki[czynnikCount]=id_czynnika;
+            if(last)czynniki[czynnikCount]=id_czynnika;
+            else czynniki[czynnikCount]="0_"+$("#nazwaCzynnika").val()+"_"+$("#typ_czynnika").val();
+
             button.innerHTML = $("#nazwaCzynnika").val()+' <i class="fa fa-times" aria-hidden="true"></i>';
             $("#panel_przyczyny").append(button);
-            $("#nazwaCzynnika").val("")
+            $("#nazwaCzynnika").val("");
+            $("#typ_czynnika").prop('disabled', '');
+            id_czynnika="";
+            last=0;
         }
 
         function addTags() {

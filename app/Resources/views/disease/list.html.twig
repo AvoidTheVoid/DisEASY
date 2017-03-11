@@ -9,9 +9,15 @@
     <div id="wrapper">
         <div id="container">
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-10">
+                    <div class="list-group">
+                        {% for key,value in choroby %}
+                            <a href="#" class="list-group-item">{{ value[1] }}</a>
+                        {% endfor %}
+
+                    </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
 
 
                 </div>

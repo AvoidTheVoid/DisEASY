@@ -8,6 +8,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Przyczyny;
 use AppBundle\Form\Type\DiseaseType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -23,14 +24,6 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class DiseaseController extends Controller
 {
-
-    /**
-     * @Route("/disease/")
-     */
-    public function showList()
-    {
-        return $this->render('disease/list.html.twig');
-    }
 
     /**
      * @Route("/disease/add")
@@ -56,20 +49,18 @@ class DiseaseController extends Controller
         $tag4->setName('dod');
         $disease->getTags()->add($tag4);
 
-        $form = $this->createForm(DiseaseType::class,$disease);
+        $form = $this->createForm(DiseaseType::class, $disease);
 
 
+        $przyczyny = $this->getDoctrine()->getRepository('AppBundle:Przyczyny')->findAll();
+        // print_r($przyczyny);
 
-        $przyczyny= $this->getDoctrine()->getRepository('AppBundle:Przyczyny')->findAll();
-       // print_r($przyczyny);
-
-        foreach($przyczyny as $a)
-        {
-            if(!is_null($a->getLatin()))$latin=" / ".($a->getLatin());
-            else $latin='';
-            $prz_form[]=[
+        foreach ($przyczyny as $a) {
+            if (!is_null($a->getLatin())) $latin = " / " . ($a->getLatin());
+            else $latin = '';
+            $prz_form[] = [
                 $a->getId(),
-                ($a->getName()).$latin,
+                ($a->getName()) . $latin,
                 $a->getType(),
             ];
 
@@ -83,22 +74,99 @@ class DiseaseController extends Controller
             $zap->flush();
 
 
-            $last_id=$task->getId();
-                foreach (explode("|",$task->getTags()[0]->getName()) as $pp) {
-                    $ch_prz=new Ch_prz();
-                    $zap = $this->getDoctrine()->getManager();
+            $last_id = $task->getId();
+            foreach (explode("|", $task->getTags()[0]->getName()) as $pp) {
+                $ch_prz = new Ch_prz();
+                $zap = $this->getDoctrine()->getManager();
+
+                if($pp)if ($pp[0] == "0") {
+                    $ptext = explode("_", $pp);
+                    $prz = new Przyczyny();
+                    $prz->setName($ptext[1]);
+                    $prz->setType($ptext[2]);
+                    $zap->persist($prz);
+                    try{$zap->flush();}
+                    catch( \PDOException $e )
+                    {
+                        if( $e->getCode() === '23000' )
+                        {
+                            echo $e->getMessage();
+
+                            // Will output an SQLSTATE[23000] message, similar to:
+                            // Integrity constraint violation: 1062 Duplicate entry 'x'
+                            // ... for key 'UNIQ_BB4A8E30E7927C74'
+                        }
+
+                        else throw $e;
+                    }
+                    $ch_prz->setChId($last_id);
+                    $ch_prz->setPrzId($prz->getId());
+                    $zap->persist($ch_prz);
+                    try{$zap->flush();}
+                    catch( \PDOException $e )
+                    {
+                        if( $e->getCode() === '23000' )
+                        {
+                            echo $e->getMessage();
+
+                            // Will output an SQLSTATE[23000] message, similar to:
+                            // Integrity constraint violation: 1062 Duplicate entry 'x'
+                            // ... for key 'UNIQ_BB4A8E30E7927C74'
+                        }
+
+                        else throw $e;
+                    }
+                } else {
+
                     $ch_prz->setChId($last_id);
                     $ch_prz->setPrzId($pp);
                     $zap->persist($ch_prz);
-                    $zap->flush();
-                }
+                    try{$zap->flush();}
+                    catch( \PDOException $e )
+                    {
+                        if( $e->getCode() === '23000' )
+                        {
+                            echo $e->getMessage();
 
-            //return $this->redirectToRoute('/disease/list');
+                            // Will output an SQLSTATE[23000] message, similar to:
+                            // Integrity constraint violation: 1062 Duplicate entry 'x'
+                            // ... for key 'UNIQ_BB4A8E30E7927C74'
+                        }
+
+                        else throw $e;
+                    }
+                }
+            }
+
+            return $this->redirect($this->generateUrl('disease_list'));
         }
-        return $this->render('disease/add.html.twig',array(
+        return $this->render('disease/add.html.twig', array(
             'form' => $form->createView(),
             'przyczyny' => $prz_form,
         ));
 
     }
+
+    /**
+     * @Route("/disease", name="disease_list"))
+     */
+    public function showList()
+    {
+        $choroby = $this->getDoctrine()->getRepository('AppBundle:Disease')->findAll();
+        foreach ($choroby as $a) {
+            if (!is_null($a->getOthernames())) $latin = " / " . ($a->getOthernames());
+            else $latin = '';
+            $prz_form[] = [
+                $a->getId(),
+                ($a->getName()) . $latin,
+                $a->getOthernames(),
+            ];
+
+        }
+        return $this->render('disease/list.html.twig',
+            array(
+                'choroby'=>$prz_form,
+            ));
+    }
+
 }
